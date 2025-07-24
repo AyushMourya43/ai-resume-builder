@@ -29,7 +29,7 @@ const WithoutAiTemp = ({ setActiveStep }) => {
       name: 'CodeCraft Classic',
       preview: temp2,
       description: 'Ideal for developers and tech professionals seeking a structured and professional format.',
-      url: '/resume-template2'
+      url: '/template2'
     },
     {
       id: 3,

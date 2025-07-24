@@ -1,7 +1,7 @@
 // controllers/geminiController.js
-import { callGeminiAPI } from "../services/geminiService.js";
+const { getEnhancedText } = require("../services/geminiService");
 
-export const enhanceSection = async (req, res) => {
+const enhanceSection = async (req, res) => {
   try {
     const { section, data } = req.body;
 
@@ -10,26 +10,49 @@ export const enhanceSection = async (req, res) => {
     }
 
     const prompt = generatePrompt(section, data);
-    const enhanced = await callGeminiAPI(prompt);
+    console.log("🧠 Prompt being sent to Gemini:", prompt);
 
-    res.json({ enhanced });
+    const enhancedText = await getEnhancedText(prompt);
+
+    // Just send raw text back for now
+    res.status(200).json({ enhanced: enhancedText });
   } catch (err) {
-    console.error("Enhancement Error:", err);
-    res.status(500).json({ error: "Something went wrong" });
+    console.error("❌ Enhancement Error:", err.message || err);
+    res.status(500).json({ error: "Something went wrong in enhanceSection" });
   }
 };
 
 const generatePrompt = (section, data) => {
   switch (section) {
     case "summary":
-      return `Improve this resume summary:\n${data}`;
+      return `You are a professional resume editor with expertise in writing concise, polished, and ATS-optimized resume summaries.
+
+Instructions:
+- Improve the following summary in a professional tone.
+- Remove unnecessary words.
+- Make it crisp (3-4 lines max).
+- Do NOT include any brackets like [ ... ] or quotes.
+- Do NOT wrap it in JSON or add 'summary:'.
+- Just return the enhanced summary text as plain, clean output.
+
+Summary to improve:
+${data}`;
+
     case "skills":
-      return `Rewrite this skills list in a professional tone:\n${data.join(", ")}`;
+      return `Improve this list of resume skills to look professional, clean, and ATS-friendly:\n${JSON.stringify(
+        data
+      )}`;
     case "experience":
-      return `Enhance this experience:\n${data.map((e) => e.accomplishment.join("\n")).join("\n")}`;
+      return `Enhance this resume experience (use bullet points if needed):\n${JSON.stringify(
+        data
+      )}`;
     case "education":
-      return `Polish this education info:\n${JSON.stringify(data)}`;
+      return `Polish this education section to be grammatically correct and professional:\n${JSON.stringify(
+        data
+      )}`;
     default:
       return `Improve this resume section:\n${JSON.stringify(data)}`;
   }
 };
+
+module.exports = { enhanceSection };

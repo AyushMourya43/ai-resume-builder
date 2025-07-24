@@ -5,23 +5,13 @@ const morgan = require("morgan");
 const path = require("path");
 const connectToMongo = require("./config/resumedb");
 const { errorHandler } = require("./utils/errorHandler");
+const geminiRoutes = require("./routes/geminiRoutes");
 
 // Dynamic Routes
-const dynamicGeminiResumeTemplateRoutes=require("./routes/dynamicRoutes/geminiResumeRoutes")
 const dynamicResumeTemplateRoutes=require("./routes/dynamicRoutes/dynamicResumeRoutes")
 
 
 const resumeTemplate1Routes = require("./routes/resumeTemplateRoutes/resumeTemplate1Route");
-const resumeTemplate2Routes = require("./routes/resumeTemplateRoutes/resumeTemplate2Route");
-const resumeTemplate3Routes = require("./routes/resumeTemplateRoutes/resumeTemplate3Route");
-const resumeTemplate4Routes = require("./routes/resumeTemplateRoutes/resumeTemplate4Route");
-const resumeTemplate5Routes = require("./routes/resumeTemplateRoutes/resumeTemplate5Route");
-const resumeTemplate6Routes = require("./routes/resumeTemplateRoutes/resumeTemplate6Route");
-const resumeTemplate7Routes = require("./routes/resumeTemplateRoutes/resumeTemplate7Route");
-const resumeTemplate8Routes=require("./routes/resumeTemplateRoutes/resumeTemplate8Route")
-
-
-
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -36,23 +26,10 @@ app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, "public")));
 
-// Dynamic resume path 
-app.use("/api/dynamic/gemini-resume", dynamicGeminiResumeTemplateRoutes);
-app.use("/api/dynamic/resume", dynamicResumeTemplateRoutes);
-
 //  Register Resume Routes with distinct paths
 app.use("/api/resume", resumeTemplate1Routes);
-app.use("/api/resume1", resumeTemplate2Routes); //resumeTamplate1 route
-app.use("/api/temp3", resumeTemplate3Routes);
-app.use("/api/temp4", resumeTemplate4Routes);
-app.use("/api/temp5", resumeTemplate5Routes); 
-app.use("/api/resume6", resumeTemplate6Routes);
-app.use("/api/resume7", resumeTemplate7Routes);
-app.use("/api/myTemp", resumeTemplate8Routes);
 
-
-
-
+app.use("/api/enhance", geminiRoutes); 
 
 // Health check route
 app.get("/health", (req, res) => {

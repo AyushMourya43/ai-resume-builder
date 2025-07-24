@@ -1,19 +1,17 @@
-export const enhanceTextWithGemini = async (section, content) => {
+import axios from "axios";
+
+export const enhanceTextWithGemini = async (section, data) => {
   try {
-    const res = await fetch("http://localhost:8000/api/enhance", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ section, content }),
+    console.log("🟢 Sending to backend:", { section, data }); // ✅ log correctly
+
+    const response = await axios.post("http://localhost:8000/api/enhance", {
+      section,
+      data,
     });
 
-    const data = await res.json();
-
-    if (res.ok) return data.enhanced;
-    else throw new Error(data.error || "Enhancement failed");
-  } catch (err) {
-    console.error("Enhance API error:", err);
+    return response.data.enhanced;
+  } catch (error) {
+    console.error("❌ Enhance API error:", error);
     return null;
   }
 };

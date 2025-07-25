@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useResume } from "../../context/ResumeContext";
 import { enhanceTextWithGemini } from "../../services/geminiService";
+import html2pdf from "html2pdf.js";
+
 import {
   FaChevronLeft,
   FaChevronRight,
@@ -18,15 +20,50 @@ const enhancementOptions = [
   "achievements",
 ];
 
-const Sidebar = ({ onEnhance }) => {
+const Sidebar = ({ onEnhance, resumeRef }) => {
   const { resumeData, setResumeData } = useResume();
   const [collapsed, setCollapsed] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
-  const [enhancingSection, setEnhancingSection] = useState(null); // ✅ New
+  const [enhancingSection, setEnhancingSection] = useState(null);
+  const [downloadRequested, setDownloadRequested] = useState(false); // ✅
+
+  const handleDownloadPDF = () => {
+    console.log("✅ Download button clicked");
+    setDownloadRequested(true);
+  };
+
+  useEffect(() => {
+  if (downloadRequested && resumeRef?.current) {
+    console.log("📄 resumeRef.current:", resumeRef.current);
+
+    const element = resumeRef.current;
+
+    setTimeout(() => {
+      html2pdf()
+        .set({
+          margin: 0.5,
+          filename: "My_Resume.pdf",
+          image: { type: "jpeg", quality: 0.98 },
+          html2canvas: { scale: 2 },
+          jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+        })
+        .from(element)
+        .save()
+        .then(() => {
+          console.log("✅ Download triggered!");
+        })
+        .catch((err) => {
+          console.error("❌ PDF Download Error:", err);
+          alert("Something went wrong while generating the PDF.");
+        });
+
+      setDownloadRequested(false);
+    }, 300); // small delay to ensure DOM is rendered
+  }
+}, [downloadRequested, resumeRef]);
 
   const handleEnhanceSection = async (section) => {
-    setEnhancingSection(section); // ✅ Disable button
-
+    setEnhancingSection(section);
     let contentToSend = "";
 
     switch (section) {
@@ -53,7 +90,7 @@ const Sidebar = ({ onEnhance }) => {
 
     const aiResponse = await enhanceTextWithGemini(section, contentToSend);
     if (!aiResponse) {
-      setEnhancingSection(null); // Reset if failed
+      setEnhancingSection(null);
       return;
     }
 
@@ -66,7 +103,10 @@ const Sidebar = ({ onEnhance }) => {
     ) {
       updated[section] =
         section === "skills"
-          ? aiResponse.split(",").map((s) => s.trim())
+          ? aiResponse
+              .split("\n")
+              .map((s) => s.replace(/^[-*•]\s*/, "").trim())
+              .filter(Boolean)
           : aiResponse;
     } else if (section === "experience") {
       updated.experience[0].accomplishment = aiResponse
@@ -79,7 +119,7 @@ const Sidebar = ({ onEnhance }) => {
     }
 
     setResumeData(updated);
-    setEnhancingSection(null); // ✅ Reset after enhancement
+    setEnhancingSection(null);
     if (onEnhance) onEnhance(section);
   };
 
@@ -90,7 +130,6 @@ const Sidebar = ({ onEnhance }) => {
       }`}
       style={{ position: "relative" }}
     >
-      {/* Collapse/Expand Toggle */}
       <button
         className="absolute -right-3 top-4 bg-gray-200 border border-gray-300 rounded-full p-1 shadow hover:bg-gray-300 transition-all"
         style={{ zIndex: 10 }}
@@ -100,7 +139,6 @@ const Sidebar = ({ onEnhance }) => {
         {collapsed ? <FaChevronRight /> : <FaChevronLeft />}
       </button>
 
-      {/* Profile/Logo Section */}
       <div className="flex items-center gap-2 mb-2">
         <FaUserCircle size={collapsed ? 32 : 40} className="text-indigo-600" />
         {!collapsed && (
@@ -134,7 +172,9 @@ const Sidebar = ({ onEnhance }) => {
                 <FaMagic className="text-indigo-500" />
                 {enhancingSection === option
                   ? `Enhancing ${option}...`
-                  : `Enhance ${option.charAt(0).toUpperCase() + option.slice(1)}`}
+                  : `Enhance ${
+                      option.charAt(0).toUpperCase() + option.slice(1)
+                    }`}
               </button>
             ))}
           </div>
@@ -145,7 +185,7 @@ const Sidebar = ({ onEnhance }) => {
           className={`w-full flex items-center gap-2 bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition-all ${
             collapsed ? "justify-center px-2" : ""
           }`}
-          onClick={() => console.log("Download PDF")}
+          onClick={handleDownloadPDF}
           title="Download PDF"
         >
           <FaFileDownload />

@@ -1,3 +1,8 @@
+html, body {
+  background-color: #ffffff;
+  color: #1f2937;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -9,7 +14,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f5f7fb;
+  background-color: #f5f7fb; /* ✅ You can delete this if already using html bg */
 }
 
 code {

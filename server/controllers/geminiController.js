@@ -25,31 +25,66 @@ const enhanceSection = async (req, res) => {
 const generatePrompt = (section, data) => {
   switch (section) {
     case "summary":
-      return `You are a professional resume editor with expertise in writing concise, polished, and ATS-optimized resume summaries.
+      return `
+You are a professional resume writer. 
+Your task is to rewrite the following summary to be concise (2-3 lines max), clear, and impactful for a software developer applying to top tech companies.
 
 Instructions:
-- Improve the following summary in a professional tone.
-- Remove unnecessary words.
-- Make it crisp (3-4 lines max).
-- Do NOT include any brackets like [ ... ] or quotes.
-- Do NOT wrap it in JSON or add 'summary:'.
-- Just return the enhanced summary text as plain, clean output.
+- Remove filler or vague phrases.
+- Keep only the most impressive, relevant details.
+- Output as 2 or 3 clean sentences, no bullet points or asterisks.
+- Do NOT include quotes, brackets, or prefixes like 'Summary:'.
 
-Summary to improve:
-${data}`;
+Original summary:
+${data}
+`;
 
     case "skills":
-      return `Improve this list of resume skills to look professional, clean, and ATS-friendly:\n${JSON.stringify(
-        data
-      )}`;
+      return `
+You are an ATS-optimized resume assistant.
+
+Instructions:
+- Rewrite the following skills into 3–4 clean bullet points, one per line.
+- Group related skills and avoid redundancy.
+- Be concise, remove outdated or generic terms.
+- Do NOT wrap output in JSON or quotes.
+
+Original skills:
+${JSON.stringify(data)}
+`;
+
     case "experience":
-      return `Enhance this resume experience (use bullet points if needed):\n${JSON.stringify(
-        data
-      )}`;
+      return `
+You are an expert resume formatter.
+
+Instructions:
+- Enhance this job experience to make it impactful and professional.
+- Follow this format:
+  Job Title @ Company
+  Duration | Location
+  • Bullet point 1 (start with action verb, describe achievement/impact)
+  • Bullet point 2 (quantify results or explain role)
+- Keep total 2–3 concise bullet points.
+- Do NOT include any placeholders like [ ... ].
+- Do NOT wrap the output in JSON or quotes.
+
+Original experience:
+${JSON.stringify(data)}
+`;
+
     case "education":
-      return `Polish this education section to be grammatically correct and professional:\n${JSON.stringify(
-        data
-      )}`;
+      return `
+Polish this education section to look professional and formatted for a resume.
+
+Instructions:
+- Include degree, institution, location, and duration.
+- Use line breaks between institution, duration, and location if needed.
+- Do NOT wrap it in quotes or JSON.
+
+Original education:
+${JSON.stringify(data)}
+`;
+
     default:
       return `Improve this resume section:\n${JSON.stringify(data)}`;
   }

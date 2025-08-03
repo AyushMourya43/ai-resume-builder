@@ -1,117 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import Sidebar from "../Sidebar/Sidebar";
+import Navbar from "../Navbar/Navbar";
+import { useResume } from "../../context/ResumeContext";
+import PageContainer from "../PageContainer";
 
 const StandardTemplate = () => {
-  const [resumeData, setResumeData] = useState({
-    name: "John Doe",
-    role: "Full Stack Developer | JavaScript | React | Node.js",
-    phone: "123-456-7890",
-    email: "john.doe@example.com",
-    linkedin: "linkedin.com/in/johndoe",
-    location: "Pune, Maharashtra",
+  const resumeRef = useRef(null);
+  const { resumeData, setResumeData } = useResume();
+  const [editMode, setEditMode] = useState(false);
+  const [localData, setLocalData] = useState(resumeData);
 
-    summary:
-      "Results-driven Full Stack Developer with 3+ years of experience in building scalable web applications using React, Node.js, and MongoDB.",
+  const handleFieldChange = (field, value) => {
+    setLocalData((prev) => ({ ...prev, [field]: value }));
+  };
 
-    experience: [
-      {
-        title: "Full Stack Developer",
-        companyName: "Tech Solutions Pvt Ltd",
-        date: "Jan 2022 – Present",
-        companyLocation: "Mumbai",
-        accomplishment: [
-          "Developed scalable web apps using MERN stack.",
-          "Improved API response time by 25%.",
-          "Collaborated with UI/UX team to implement responsive designs."
-        ]
-      },
-      {
-        title: "Frontend Developer Intern",
-        companyName: "Web Creators",
-        date: "Jun 2021 – Dec 2021",
-        companyLocation: "Pune",
-        accomplishment: [
-          "Built reusable components using React.js.",
-          "Integrated third-party APIs.",
-          "Worked in Agile sprints with backend team."
-        ]
-      }
-    ],
+  const handleSave = () => {
+    setResumeData(localData);
+    setEditMode(false);
+  };
 
-    education: [
-      {
-        degree: "Bachelor of Engineering in Computer Science",
-        institution: "Savitribai Phule Pune University",
-        duration: "2017 – 2021",
-        location: "Pune"
-      }
-    ],
+  const handleCancel = () => {
+    setLocalData(resumeData);
+    setEditMode(false);
+  };
 
-    achievements: [
-      {
-        keyAchievements: "Best Project Award",
-        describe:
-          "Won the Best Final Year Project Award for developing an AI-powered Resume Builder."
-      },
-      {
-        keyAchievements: "Hackathon Winner",
-        describe:
-          "Secured 1st place in a 48-hour hackathon for building a scalable e-commerce platform."
-      }
-    ],
-
-    skills: [
-      "React.js",
-      "JavaScript",
-      "Node.js",
-      "MongoDB",
-      "Git",
-      "RESTful APIs"
-    ],
-
-    languages: ["English", "Hindi"],
-
-    projects: [
-      {
-        title: "AI Resume Builder",
-        description: "Built full-stack resume builder with Gemini API and PDF export.",
-        duration: "6 months"
-      },
-      {
-        title: "E-Commerce Platform",
-        description: "Developed scalable e-commerce platform with product search and payments.",
-        duration: "4 months"
-      }
-    ],
-
-    courses: [
-      {
-        title: "MERN Stack Development",
-        description: "Completed hands-on MERN stack course with multiple projects."
-      },
-      {
-        title: "AWS Cloud Practitioner",
-        description: "Learned AWS cloud deployment and serverless architecture."
-      }
-    ],
-
-    certifications: [
-      {
-        title: "AWS Certified Developer",
-        issuedBy: "Amazon Web Services",
-        year: "2024"
-      },
-      {
-        title: "React Advanced Certification",
-        issuedBy: "Coursera",
-        year: "2023"
-      }
-    ],
-
-    hobbies: ["Reading Tech Blogs", "Photography", "Cycling"]
-  });
-
-  return (
-    <div className="p-6 max-w-4xl mx-auto bg-white rounded-xl shadow-md space-y-6">
+    return (
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      <div className="flex">
+        <Sidebar onEnhance={handleEnhance} resumeRef={resumeRef} />
+        <div className="flex-grow p-10 flex flex-col items-center">
+          <PageContainer>
+            <div ref={resumeRef} className="bg-white p-8 w-full space-y-6">
       <h1 className="text-3xl font-bold text-center">{resumeData.name}</h1>
       <h2 className="text-xl text-center text-gray-600">{resumeData.role}</h2>
       <p className="text-center">📍 {resumeData.location} | 📞 {resumeData.phone} | ✉️ {resumeData.email}</p>
@@ -135,8 +55,51 @@ const StandardTemplate = () => {
         ))}
       </section>
 
-      {/* Repeat for education, achievements, skills, etc. */}
+              {/* Education Section */}
+              <section>
+                <h3 className="text-xl font-semibold">Education</h3>
+                {resumeData.education?.map((edu, idx) => (
+                  <div key={idx} className="mb-2">
+                    <h4 className="font-bold">{edu.degree}</h4>
+                    <p>{edu.institution} ({edu.duration})</p>
+                    <p className="italic">{edu.location}</p>
+                  </div>
+                ))}
+              </section>
 
+              {/* Skills Section */}
+              <section>
+                <h3 className="text-xl font-semibold">Skills</h3>
+                <div className="flex flex-wrap gap-2">
+                  {resumeData.skills?.map((skill, idx) => (
+                    <span key={idx} className="bg-gray-200 px-3 py-1 rounded-full text-sm">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </section>
+
+              {/* Buttons */}
+              <div className="mt-6 flex justify-center gap-4">
+                {editMode ? (
+                  <>
+                    <button onClick={handleSave} className="bg-green-600 text-white px-4 py-2 rounded">
+                      Save
+                    </button>
+                    <button onClick={handleCancel} className="bg-gray-400 text-white px-4 py-2 rounded">
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <button onClick={() => setEditMode(true)} className="bg-blue-600 text-white px-4 py-2 rounded">
+                    Edit
+                  </button>
+                )}
+              </div>
+            </div>
+          </PageContainer>
+        </div>
+      </div>
     </div>
   );
 };

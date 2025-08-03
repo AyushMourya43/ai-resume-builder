@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Sidebar from "../Sidebar/Sidebar";
 import Navbar from "../Navbar/Navbar";
 import { useResume } from "../../context/ResumeContext";
+import PageContainer from "../PageContainer";
 
 const Template2 = () => {
+  const resumeRef = useRef(null);
   const { resumeData, setResumeData } = useResume();
   const [editMode, setEditMode] = useState(false);
   const [localData, setLocalData] = useState(resumeData);
@@ -30,9 +32,10 @@ const Template2 = () => {
     <div className="min-h-screen bg-slate-100">
       <Navbar />
       <div className="flex">
-        <Sidebar onEnhance={handleEnhance} />
+        <Sidebar onEnhance={handleEnhance} resumeRef={resumeRef} />
         <main className="flex-grow p-8 text-gray-800">
-          <div className="bg-white rounded-lg shadow-lg p-8 max-w-5xl mx-auto">
+          <PageContainer>
+            <div ref={resumeRef} className="bg-white p-8 w-full">
 
             {/* Header */}
             <div className="flex justify-between items-start border-b pb-4 mb-4">
@@ -206,7 +209,8 @@ const Template2 = () => {
                 <button onClick={() => setEditMode(true)} className="bg-blue-600 text-white px-4 py-1 rounded">Edit</button>
               )}
             </div>
-          </div>
+                      </div>
+          </PageContainer>
         </main>
       </div>
     </div>

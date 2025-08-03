@@ -36,7 +36,7 @@ const WithoutAiTemp = ({ setActiveStep }) => {
       name: 'TechSlate Pro',
       preview: Temp3,
       description: 'Tailored for engineers and developers to highlight projects, certifications, and skills with clarity and precision.',
-      url: '/resume-template3'
+      url: '/template3'
     },
     {
       id: 4,

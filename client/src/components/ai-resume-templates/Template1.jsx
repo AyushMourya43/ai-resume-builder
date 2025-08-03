@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import Sidebar from "../Sidebar/Sidebar";
 import Navbar from "../Navbar/Navbar";
 import { useResume } from "../../context/ResumeContext";
+import PageContainer from "../PageContainer";
 
 const Template1 = () => {
   const resumeRef = useRef(null);
@@ -51,17 +52,15 @@ const Template1 = () => {
             alignItems: "center",
           }}
         >
-          <div
-            ref={resumeRef}
-            style={{
-              backgroundColor: "#ffffff",
-              color: "#1f2937",
-              maxWidth: "72rem", // Tailwind max-w-6xl
-              width: "100%",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-              padding: "2.5rem", // Tailwind p-10
-            }}
-          >
+          <PageContainer>
+            <div
+              ref={resumeRef}
+              style={{
+                backgroundColor: "#ffffff",
+                color: "#1f2937",
+                width: "100%",
+              }}
+            >
             {/* Header */}
             <div
               style={{
@@ -389,6 +388,7 @@ const Template1 = () => {
               </div>
             </div>
           </div>
+          </PageContainer>
 
           {/* Buttons */}
           <div style={{ marginTop: "1.5rem", textAlign: "center" }}>
